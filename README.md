@@ -5,8 +5,11 @@ Installing Docker In Amazon Linux 2
 Please follow the below commands to install Docker in Amazon Linux :-
 
 $ sudo yum install docker -y
+
 $ sudo usermod -a -G docker ec2-user
+
 $ sudo service docker restart
+
 $ sudo chkconfig docker on
 
 
