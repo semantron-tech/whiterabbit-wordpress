@@ -69,3 +69,86 @@ server {
   }
 }
 ```
+
+
+docker-compose.yml
+==========
+
+Finally we need to create the docker compose file :-
+
+```
+version: '3'
+services:
+  database:
+    image: mysql:5.6
+    container_name: database
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+       - wp-net
+    environment:
+      MYSQL_ROOT_PASSWORD: mysqlroot123
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    
+  wordpress:
+    image: wordpress:php7.3-fpm-alpine
+    restart: always
+    container_name: wordpress
+    volumes:
+      - wp-data:/var/www/html
+    depends_on:
+      - database
+    environment:
+      WORDPRESS_DB_HOST: database
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    networks:
+      - wp-net
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    container_name: nginx
+    volumes:
+      - wp-data:/var/www/html/
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    networks:
+      - wp-net
+
+networks:
+  app-net:    
+volumes:
+  db-data:
+  wp-data:
+
+networks:
+  wp-net:
+
+```
+  
+  
+Creating Service
+============
+```
+$ docker-compose up -d
+nginx is up-to-date
+database is up-to-date
+wordpress is up-to-date
+```
+
+Now the Docker-compose will be up and we can check the status with 'ps' command as followed below:-
+
+```
+$ docker-compose ps
+  Name                 Command               State         Ports       
+-----------------------------------------------------------------------
+database    docker-entrypoint.sh mysqld      Up      3306/tcp          
+nginx       /docker-entrypoint.sh ngin ...   Up      0.0.0.0:80->80/tcp
+wordpress   docker-entrypoint.sh php-fpm     Up      9000/tcp
+```
